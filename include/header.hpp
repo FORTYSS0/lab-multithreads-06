@@ -5,6 +5,8 @@
 
 #include <nlohmann/json.hpp>
 #include <mutex>
+#include <thread>
+#include "../PicoSHA2/picosha2.h"
 #include <boost/log/trivial.hpp>
 #include <boost/thread.hpp>
 #include <boost/log/core.hpp>
@@ -22,19 +24,30 @@
 using json = nlohmann::json;
 
 class Multith{
- private:
  public:
+  Multith(int argc, char *argv[]);
+  ~Multith(){
+    for(unsigned int i = 0; i < n_thr; ++i) {
+      thr[i].join();
+    }
+  };
   void loger() {
-    boost::log::add_file_log (
+    boost::log::add_file_log(
         boost::log::keywords::file_name = "logs/log_%5N.log",
         boost::log::keywords::rotation_size = 10 * 1024 * 1024,
         boost::log::keywords::time_based_rotation =
-            boost::log::sinks::file::rotation_at_time_point(
-                0, 0, 0),
+            boost::log::sinks::file::rotation_at_time_point(0, 0, 0),
         boost::log::keywords::format =
-            "[%TimeStamp%][%Severity%][%ThreadID%]: %Message%"
-        );
+            "[%TimeStamp%][%Severity%][%ThreadID%]: %Message%");
+    };
+  std::string hash(std::string src_str){
+    std::string hash_hex_str;
+    picosha2::hash256_hex_string(src_str, hash_hex_str);
+    return hash_hex_str;
   }
-  void
+
+ private:
+  unsigned int n_thr;
+  std::vector<std::thread> thr;
 };
 #endif // INCLUDE_HEADER_HPP_
