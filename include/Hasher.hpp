@@ -1,4 +1,4 @@
-// Copyright 2020 lamp
+// Copyright 2021 by FORTYSS
 
 #ifndef INCLUDE_HEADER_HPP_
 #define INCLUDE_HEADER_HPP_
@@ -22,17 +22,17 @@
 #include <boost/program_options/variables_map.hpp>
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
-namespace logging = boost::log;
-namespace src = boost::log::sources;
-namespace sinks = boost::log::sinks;
-namespace keywords = boost::log::keywords;
-namespace po = boost::program_options;
+//namespace logging = boost::log;
+//namespace src = boost::log::sources;
+//namespace sinks = boost::log::sinks;
+//namespace keywords = boost::log::keywords;
+//namespace po = boost::program_options;
 
-typedef src::severity_logger<logging::trivial::severity_level> logger;
+typedef boost::log::sources::severity_logger<boost::log::trivial::severity_level> logger;
 
 class Console {
  private:
-  static po::options_description desc;
+  static boost::program_options::options_description desc;
   static std::string fileName;
   static size_t threadsCount;
   class Hasher {
@@ -48,9 +48,19 @@ class Console {
     static void sigHandler(int signum);
   };
  public:
-  static int wmain(const po::variables_map& vm);
+    void logge() {
+        boost::log::add_file_log(
+                boost::log::keywords::file_name = "logs/log_%5N.log",
+                boost::log::keywords::rotation_size = 10 * 1024 * 1024,
+                boost::log::keywords::time_based_rotation =
+                        boost::log::sinks::file::rotation_at_time_point(0, 0, 0),
+                boost::log::keywords::format = "[%TimeStamp%][%Severity%][%ThreadID%]: %Message%");
+
+        srand(time(nullptr));
+    }
+  static int wmain(const boost::program_options::variables_map& vm);
   Console();
-  po::options_description& getDesc() const{ return desc; }
+    boost::program_options::options_description& getDesc() const{ return desc; }
 };
 
 #endif // INCLUDE_HEADER_HPP_

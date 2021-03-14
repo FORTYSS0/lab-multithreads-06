@@ -1,4 +1,4 @@
-// Copyright 2020 Your Name <your_email>
+// Copyright 2021 by FORTYSS
 #include <Hasher.hpp>
 
 std::mutex Console::Hasher::mutie;
@@ -10,15 +10,15 @@ size_t Console::threadsCount;
 
 Console::Console() {
   desc.add_options()("help,h", "help message")(
-      "output,o", po::value<std::string>(), "Set output .json file. Base value is <logJson/log.json>")(
-      "threads,t", po::value<int>(),
+      "output,o", boost::program_options::value<std::string>(), "Set output .json file. Base value is <logJson/log.json>")(
+      "threads,t", boost::program_options::value<int>(),
       "Sets threads count. Base value is <boost::thread::hardware_concurrency>")
-      ("times,t", po::value<int>(), "<NOT WORKING> Sets number of true values, if you want to stop at a specific moment");
+      ("times,t", boost::program_options::value<int>(), "<NOT WORKING> Sets number of true values, if you want to stop at a specific moment");
 
 }
 
 
-int Console::wmain(const po::variables_map& vm) {
+int Console::wmain(const boost::program_options::variables_map& vm) {
   if (vm.count("help")) {
     std::cout << "This program is used to generate true hash values\nfrom random data and to write them into the .json file\n"
               << desc << "\nCOPYRIGHT 2021 LAMP\n";
@@ -77,7 +77,7 @@ void Console::Hasher::sigHandler(int signum) {
 }
 
 void Console::Hasher::startHashing() {
-  logging::add_common_attributes();
+    boost::log::add_common_attributes();
 
   std::chrono::time_point start = std::chrono::high_resolution_clock::now();
   for (size_t i = 0; i < threadsCount; ++i) {
@@ -102,14 +102,14 @@ void Console::Hasher::startHashing() {
     mutie.unlock();
 
     if (result.substr(result.length() - hashEnd.length()) == hashEnd) {
-      BOOST_LOG_SEV(lg, logging::trivial::info)
+      BOOST_LOG_SEV(lg, boost::log::trivial::info)
           << "\nCorrect value: '" << randomString << "'" << std::endl
           << "With hash: '" << result << "'\n";
       json j = {
           {"timestamp", timestamp}, {"hash", result}, {"data", randomString}};
       correctValues.emplace_back(j);
     } else {
-      BOOST_LOG_SEV(lg, logging::trivial::trace)
+      BOOST_LOG_SEV(lg, boost::log::trivial::trace)
           << "\nValue to encode '" << randomString << "'" << std::endl
           << "With hash: '" << result << "'\n";
     }
