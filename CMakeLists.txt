@@ -22,7 +22,7 @@ HunterGate(
 )
 
 
-project(threading VERSION 0.1.0 )
+project(Multithreads VERSION 0.1.0 )
 enable_language(C CXX)
 set(CMAKE_THREAD_LIBS_INIT "-lpthread")
 set(CMAKE_HAVE_THREADS_LIBRARY 1)
@@ -47,7 +47,7 @@ find_package(Threads)
 
 
 add_library(${PROJECT_NAME} STATIC
-        ${CMAKE_SOURCE_DIR}/sources/Hasher.cpp
+        ${CMAKE_SOURCE_DIR}/sources/multithread.cpp
         )
 
 target_include_directories( ${PROJECT_NAME} PUBLIC
