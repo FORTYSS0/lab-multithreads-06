@@ -1,8 +1,7 @@
 // Copyright 2021 by FORTYSS
 #include <multithread.hpp>
-
-void Multith::start(const bool& key) {
-  logging::add_common_attributes();
+void Multith::log(){
+    logging::add_common_attributes();
   logging::add_console_log(std::clog, boost::log::keywords::format =
                                           "[%Severity%] %TimeStamp%: %Message%"
                            );
@@ -15,18 +14,23 @@ void Multith::start(const bool& key) {
               boost::log::sinks::file::rotation_at_time_point(0,
                                                               0,
                                                               0),
-          boost::log::keywords::format = "[%Severity%][%TimeStamp%]: %Message%"
+          boost::log::keywords::format =
+              "[%Severity%][%TimeStamp%]: %Message%"
       );
+}
+void Multith::start() {
+  log();
   for(unsigned int i = 0; i < number_threads; ++i){
     threads.emplace_back(std::thread([&](){
-      do_hashing(key);
+      hashing();
     }));
   }
 }
 
-void Multith::do_hashing(const bool& key) {
+void Multith::hashing() {
   std::chrono::system_clock::time_point start =
       std::chrono::high_resolution_clock::now();
+  bool key = true;
   while(key){
     mutex.lock();
     src_str = std::to_string(std::rand());
@@ -35,13 +39,13 @@ void Multith::do_hashing(const bool& key) {
         std::chrono::high_resolution_clock::now();
     duration += static_cast<int>(std::chrono::nanoseconds(end - start).count());
     start = end;
-    sort_hash(hash_hex_str);
+    sort(hash_hex_str);
     mutex.unlock();
     std::this_thread::sleep_for(std::chrono::microseconds(2));
   }
 }
 
-void Multith::sort_hash(std::string &hash) {
+void Multith::sort(std::string &hash) {
   if(hash_hex_str.substr(60, 4) == end_of_str) {
     BOOST_LOG_SEV(slg, logging::trivial::info) << std::endl
                              << "sourse: " << std::hex << std::stol(src_str)
@@ -55,7 +59,7 @@ void Multith::sort_hash(std::string &hash) {
         {"hash_hex", hash_hex_str},
         {"duration", duration}
     };
-    right_hashs.push_back(j);
+    true_hashs.push_back(j);
   } else {
     BOOST_LOG_SEV(slg, logging::trivial::trace) << std::endl
                               << "sourse: " << std::hex << std::stol(src_str)
@@ -65,3 +69,4 @@ void Multith::sort_hash(std::string &hash) {
                               << std::endl;
   }
 }
+std::vector<json> Multith::true_hashs;

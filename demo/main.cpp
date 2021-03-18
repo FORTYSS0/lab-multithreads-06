@@ -3,7 +3,7 @@
 
 
 int main(int argc, char *argv[]) {
-  signal(SIGINT, Multith::signal_catch);
+  signal(SIGINT, Multith::catch_signal);
   Multith hasher(argc, argv);
-  hasher.start(true);
+  hasher.start();
 }

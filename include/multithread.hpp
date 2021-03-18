@@ -36,33 +36,34 @@ class Multith {
     }
   }
 
-  void static signal_catch(int signum){
-    write_to_json_file("logs_0000.json");
+  void static catch_signal(int signum){
+    write_json("logs_0000.json");
     sleep(1);
     std::cout << "\nProgram aborted with code " << --signum << "\n";
     exit(signum);
   }
 
-  void static write_to_json_file(const std::string& file_name){
-    std::ofstream output_file;
-    std::ifstream input_file;
-    output_file.open(file_name);
-    input_file.open(file_name);
+  void static write_json(const std::string& file_name){
+    std::ofstream out;
+    std::ifstream in;
+    out.open(file_name);
+    in.open(file_name);
     json out_json;
-    if(input_file.peek() != EOF)
-      input_file >> out_json;
-    for(auto & right_hash : right_hashs) {
-      out_json["values"].push_back(right_hash);
+    if(in.peek() != EOF)
+      in >> out_json;
+    for(auto & true_hash : true_hashs) {
+      out_json["values"].push_back(true_hash);
     }
-    output_file << out_json.dump(4);
-    output_file.close();
+    out << out_json.dump(4);
+    out.close();
   };
 
-  void start(const bool& key);
+  void start();
+  void log();
 
-  void sort_hash(std::string& hash);
+  void sort(std::string& hash);
 
-  void do_hashing(const bool& key);
+  void hashing();
  private:
   std::mutex mutex;
   unsigned int number_threads;
@@ -70,7 +71,7 @@ class Multith {
   std::string src_str;
   std::string hash_hex_str;
   std::vector<std::thread> threads;
-  static std::vector<json> right_hashs;
+  static std::vector<json> true_hashs;
   boost::log::sources::severity_logger< logging::trivial::severity_level > slg;
 };
 
