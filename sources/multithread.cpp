@@ -13,7 +13,7 @@ void Multith::log(){
           boost::log::keywords::time_based_rotation =
               boost::log::sinks::file::rotation_at_time_point(0,
                                                               0,
-                                                              0),
+                                                               0),
           boost::log::keywords::format =
               "[%Severity%][%TimeStamp%]: %Message%"
       );
